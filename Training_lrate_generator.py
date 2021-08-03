@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import random
 from keras import callbacks
-import Modules.Networks_Antonio.Callbacks as cb
+import Modules.Networks.Callbacks as cb
 import Modules.Common_modules as cm
 from Modules.CommonUtil.ImageGeneratorManager import *
 from Modules.CommonUtil.KerasBatchDataGenerator import *
@@ -15,9 +15,9 @@ from Testing import test_net_dice
 from Testing_post_processing import test_net_dice_post
 
 
-img_rows = cm.WMHshape[1]
-img_cols = cm.WMHshape[2]
-slices = cm.WMHshape[0]
+img_rows = cm.shape[1]
+img_cols = cm.shape[2]
+slices = cm.shape[0]
 
 
 def train_and_predict(args, job, data_split, seed, model, root_path, pretrain, num_epoch):
@@ -36,47 +36,6 @@ def train_and_predict(args, job, data_split, seed, model, root_path, pretrain, n
     np.random.seed(data_seed)
 
     # Create image list
-    GE3T_imgList = sorted(glob('data/WMH/GE3T/img_*.npy'))
-    GE3T_maskList = sorted(glob('data/WMH/GE3T/mask_*.npy'))
-
-    Singapore_imgList = sorted(glob('data/WMH/Singapore/img_*.npy'))
-    Singapore_maskList = sorted(glob('data/WMH/Singapore/mask_*.npy'))
-
-    Utrecht_imgList = sorted(glob('data/WMH/Utrecht/img_*.npy'))
-    Utrecht_maskList = sorted(glob('data/WMH/Utrecht/mask_*.npy'))
-
-    # Random selection for training, validation and testing
-    GE3T_list = [list(pair) for pair in zip(GE3T_imgList, GE3T_maskList)]
-    Singapore_list = [list(pair) for pair in zip(Singapore_imgList, Singapore_maskList)]
-    Utrecht_list = [list(pair) for pair in zip(Utrecht_imgList, Utrecht_maskList)]
-
-    np.random.shuffle(GE3T_list)
-    np.random.shuffle(Singapore_list)
-    np.random.shuffle(Utrecht_list)
-
-    # if data_split == '36L':
-    #     x_train_list, y_train_list = map(list, zip(
-    #         *(GE3T_list[0:  12] + Singapore_list[0:  12] + Utrecht_list[0:  12])))
-    #     x_val_list, y_val_list = map(list, zip(
-    #         *(GE3T_list[12: 16] + Singapore_list[12: 16] + Utrecht_list[12: 16])))
-    #     test_img_list, test_mask_list = map(list, zip(
-    #         *(GE3T_list[16: 20] + Singapore_list[16: 20] + Utrecht_list[16: 20])))
-
-    if data_split == '36L':
-        x_train_list, y_train_list = map(list, zip(
-            *(GE3T_list[0:  1] + Singapore_list[0:  0] + Utrecht_list[0:  0])))
-        x_val_list, y_val_list = map(list, zip(
-            *(GE3T_list[12: 13] + Singapore_list[12: 12] + Utrecht_list[12: 12])))
-        test_img_list, test_mask_list = map(list, zip(
-            *(GE3T_list[16: 20] + Singapore_list[16: 20] + Utrecht_list[16: 20])))
-
-    elif data_split == '54L':
-        x_train_list, y_train_list = map(list, zip(
-            *(GE3T_list[0:  18] + Singapore_list[0:  18] + Utrecht_list[0:  18])))
-        x_val_list, y_val_list = map(list, zip(
-            *(GE3T_list[18: 20] + Singapore_list[18: 20] + Utrecht_list[18: 20])))
-        test_img_list, test_mask_list = map(list, zip(
-            *(GE3T_list[18: 20] + Singapore_list[18: 20] + Utrecht_list[18: 20])))
 
     # visualize validation results during training
     vis_num = 0
@@ -210,7 +169,7 @@ def train_model(Test_only, job, split, seed, folder_name, num_epoch):
     basic_path = folder_name + str(job) + '/' + str(split)
 
     if job == 'CNN_baseline':
-        model = UNet_3D.get_3d_unet_norm(8)
+        model = UNet_3D.get_3d_unet_norm(16)
 
         root_path = basic_path + '/seed' + str(seed) + '/'
         cm.mkdir(root_path + 'model')
